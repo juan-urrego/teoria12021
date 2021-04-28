@@ -13,7 +13,7 @@ export class AppComponent {
   //IDENTIFY ---> R.EX
   nombreVariable: string;
   //OPERATOR -----> automata
-  operador: string[] = ['=', '+', '-', '*', '/', '%', '==', '!=', '<=', '>=', '&&', '||']
+  operador: string[] = ['=', '+', '-', '*', '/', '%', '==', '!', '<', '>', '&&', '||']
   //NUMERIC CONST ----> REX
   numConst: number
   //CHAR CONST "" '' ---->Automata
@@ -21,34 +21,41 @@ export class AppComponent {
   //SEPARATOR 
   separador: string[] = ['(', ')', '{', '}', ',', '.', ';', '[', ']']
   //(nombreVariable, inta) -> (operador, =)
-
-
+  
   entrada: string;
   salida: string;
-
-
-
+  prueba: string;
+  
 
   constructor() {
-
+    
   }
 
   transformar() {
-    let prueba: string[] = [];
+    let prueba: string[] = [' '];
+
+    let prueba2 = [];
+    let todo = [this.entrada]
     //guardamos los string en un array filas cada salto de linea
     let filas = this.entrada.split('\n');
-    console.log(filas);
-
-    //para leer cada salto de linea
-    filas.forEach(fila => {
-      //Guardamos en un array letra por letra dependiendo de cada fila  
-      for (let i = 0; i < fila.length; ++i) {
-        prueba.push(String(fila[i]));
-      }
-      //Se analiza todas las letras de una fila
-
+    prueba=prueba.concat(this.operador).concat(this.separador);
+    
+    prueba.forEach(caracter => {
+      todo = this.separarPorSimbolo(caracter, todo)
     });
-    console.log(prueba);
+    
+
+    todo.map(iteracion => {
+      
+      
+      if  (this.automataKeyword(iteracion)){
+        console.log("iteracion",iteracion);
+      }else{
+        console.log("err");
+        
+      }
+    })
+  
 
 
   }
@@ -60,12 +67,26 @@ export class AppComponent {
 
   }
 
+  separarPorSimbolo(caracter:string, texto:string[]): string[]{
+    let arreglo=[];
+    texto.map(palabra=>{
+      let iguales = palabra.split(caracter);
+      for(let i = 0; i < iguales.length; i++){
+        arreglo.push(iguales[i]);
+        arreglo.push(caracter);        
+      }
+      arreglo.pop();
 
-  automataKeyword(keyword: string) {
+    })      
+    return arreglo;
+  }
+
+
+  automataKeyword(palabra: string): boolean {
     //aca tiramos codigo del automata goto, pero con las palabras 
-    
-    const arrayLetters = Array.from(keyword)
+    const arrayLetters=Array.from(palabra);
     let state = "initial";
+    const acceptedStates= ["function","var","let","if","const"];
     arrayLetters.map(letter =>{
 
           switch(state){
@@ -96,13 +117,13 @@ export class AppComponent {
             case "fun":
               state= letter =="c" ? "func":"err"
               break;
-              case "func":
-                state= letter =="t" ? "funct":"err"
-                break;
+            case "func":
+              state= letter =="t" ? "funct":"err"
+              break;
             case "funct":
               state= letter =="i" ? "functi":"err"
               break;
-            case "fucti":
+            case "functi":
               state= letter =="o" ? "functio":"err"
               break;  
             case "functio":
@@ -157,15 +178,17 @@ export class AppComponent {
               state="err";
               break;
             case "err":
-              break;  
-
+              break;
           }
-          if state in["function","var","let","if","const"]{
-
-          }
-          return true;
 
     })
+  
+    
+    if(acceptedStates.indexOf(state)==-1) {
+
+      return false;
+    }
+    return true;
 
 
   }
