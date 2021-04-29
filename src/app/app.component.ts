@@ -25,7 +25,6 @@ export class AppComponent {
   entrada: string;
   salida: string;
   prueba: string;
-  
 
   constructor() {
     
@@ -38,21 +37,41 @@ export class AppComponent {
     let todo = [this.entrada]
     //guardamos los string en un array filas cada salto de linea
     let filas = this.entrada.split('\n');
+
+    //Guardamos un array con todos los simbolos que pueden ser separadores para una keyword
     prueba=prueba.concat(this.operador).concat(this.separador);
     
+    //Separo todo por diferentes caracteres
     prueba.forEach(caracter => {
       todo = this.separarPorSimbolo(caracter, todo)
     });
-    
 
+    //Elimino elementos vacios en el array
+    prueba2 = todo.filter(x => x !== '' && x !== ' ');
+
+    //extraigo los numeros se parados por (espacios)
+    
+    var valoresAceptados =  /^[0-9]*(\.?)[0-9]+$/;
+    var valorString = ",(\"[^\"]*\"|[^,]*)";
+    
+    
     todo.map(iteracion => {
+      console.log(iteracion);
+
+      //comprobacion de numeros en el array
+      if(iteracion.match(valoresAceptados)){
+        console.log("iteracion numerica", iteracion);
+        
+      }
+      //comprobacion de charConst ---> REVISAR
+      if(iteracion.match(valorString)){
+        console.log("iteracion string", iteracion);
+        
+      }
       
-      
+      //comprobacion de keywords     
       if  (this.automataKeyword(iteracion)){
         console.log("iteracion",iteracion);
-      }else{
-        console.log("err");
-        
       }
     })
   
