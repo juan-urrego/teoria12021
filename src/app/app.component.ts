@@ -31,55 +31,102 @@ export class AppComponent {
   }
 
   transformar() {
-    let prueba: string[] = [' '];
+    let caracteresEspeciales: string[] = [' '];
+    //Guardamos un array con todos los simbolos que pueden ser separadores para una keyword
+    caracteresEspeciales=caracteresEspeciales.concat(this.operador).concat(this.separador);
 
-    let prueba2 = [];
-    let todo = [this.entrada]
+
     //guardamos los string en un array filas cada salto de linea
     let filas = this.entrada.split('\n');
-
-    //Guardamos un array con todos los simbolos que pueden ser separadores para una keyword
-    prueba=prueba.concat(this.operador).concat(this.separador);
+    
+    //Separamos las palabras con comillas
+    let todo = this.leerCharConst(this.entrada);
+    console.log("sin separar por caracteres", todo);
+    
     
     //Separo todo por diferentes caracteres
-    prueba.forEach(caracter => {
+    caracteresEspeciales.forEach(caracter => {
       todo = this.separarPorSimbolo(caracter, todo)
     });
 
     //Elimino elementos vacios en el array
-    prueba2 = todo.filter(x => x !== '' && x !== ' ');
+    todo = todo.filter(x => x !== '' && x !== ' ');
 
     //extraigo los numeros se parados por (espacios)
     
     var valoresAceptados =  /^[0-9]*(\.?)[0-9]+$/;
-    var valorString = ",(\"[^\"]*\"|[^,]*)";
+    // var valorString = "((?:[^\"\\]|\\.)*)";
+    
+    console.log("todo el array de iteraciones",todo);    
     
     
     todo.map(iteracion => {
-      console.log(iteracion);
+      console.log("iteracion",iteracion);
+      
+
+      //comprobacion de charConst ---> REVISAR
+      // if(iteracion.match(valorString)){
+        // console.log("valor analizar",iteracion);
+        
+        // prueba3 = this.leerCharConst(iteracion);
+        // console.log(prueba3);              
+        
+      // }
 
       //comprobacion de numeros en el array
       if(iteracion.match(valoresAceptados)){
-        console.log("iteracion numerica", iteracion);
-        
-      }
-      //comprobacion de charConst ---> REVISAR
-      if(iteracion.match(valorString)){
-        console.log("iteracion string", iteracion);
-        
+        console.log("iteracion numerica", iteracion);        
       }
       
       //comprobacion de keywords     
       if  (this.automataKeyword(iteracion)){
-        console.log("iteracion",iteracion);
+        console.log("iteracion keyword",iteracion);
       }
     })
   
 
-
   }
-  leerDatos() {
 
+  leerCharConst(cadena: string): string[] {
+    let numeroComillasDobles = 0;    
+    let stringNuevo : string = "";
+    let stringNuevo2: string = "";
+    let arrayNuevo = [];
+    for (let i = 0; i < cadena.length; ++i) {      
+      
+      if(String(cadena[i]) == "\"") {   
+        if(stringNuevo2.length != 0){
+          arrayNuevo.push(stringNuevo2);
+          stringNuevo2 ="";
+        }     
+        numeroComillasDobles++;
+      }
+
+      if(numeroComillasDobles == 0){
+        stringNuevo2 = stringNuevo2 + cadena[i]
+      }
+      if(numeroComillasDobles == 1) {
+        stringNuevo = stringNuevo + cadena[i]
+      }
+      if(numeroComillasDobles == 2) {
+        stringNuevo = stringNuevo + "\"";
+        numeroComillasDobles = 0;
+        arrayNuevo.push(stringNuevo);
+        stringNuevo = "";
+      }
+      if(i == cadena.length -1 && numeroComillasDobles==1){
+        arrayNuevo.push(stringNuevo);
+      }
+      
+      
+
+    }
+    if(stringNuevo2.length != 0){
+
+      arrayNuevo.push(stringNuevo2);
+    }
+    
+    return arrayNuevo;
   }
 
   escribirDatos() {
@@ -89,12 +136,14 @@ export class AppComponent {
   separarPorSimbolo(caracter:string, texto:string[]): string[]{
     let arreglo=[];
     texto.map(palabra=>{
-      let iguales = palabra.split(caracter);
-      for(let i = 0; i < iguales.length; i++){
-        arreglo.push(iguales[i]);
-        arreglo.push(caracter);        
+      if(palabra[0] != "\""){        
+        let iguales = palabra.split(caracter);
+        for(let i = 0; i < iguales.length; i++){
+          arreglo.push(iguales[i]);
+          arreglo.push(caracter);        
+        }
+        arreglo.pop();
       }
-      arreglo.pop();
 
     })      
     return arreglo;
