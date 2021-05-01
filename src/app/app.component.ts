@@ -19,18 +19,20 @@ export class AppComponent {
   //CHAR CONST "" '' ---->Automata
   textoString: string;
   //SEPARATOR 
-  separador: string[] = ['(', ')', '{', '}', ',', '.', ';', '[', ']']
+  separador: string[] = ['(', ')', '{', '}', ',', '.', ';', '[', ']','\n']
   //(nombreVariable, inta) -> (operador, =)
   
   entrada: string;
   salida: string;
   prueba: string;
-
+  
+  
   constructor() {
     
   }
-
+  
   transformar() {
+    let token: string[] = [];
     let caracteresEspeciales: string[] = [' '];
     //Guardamos un array con todos los simbolos que pueden ser separadores para una keyword
     caracteresEspeciales=caracteresEspeciales.concat(this.operador).concat(this.separador);
@@ -41,27 +43,41 @@ export class AppComponent {
     
     //Separamos las palabras con comillas
     let todo = this.leerCharConst(this.entrada);
-    console.log("sin separar por caracteres", todo);
+    // console.log("sin separar por caracteres", todo);
     
     
     //Separo todo por diferentes caracteres
-    caracteresEspeciales.forEach(caracter => {
-      todo = this.separarPorSimbolo(caracter, todo)
+    todo.map(palabra => {
+      if(palabra[0] == "\""){
+        token.push(palabra);
+      }else{
+        var prueba5 = [palabra];
+        caracteresEspeciales.map(caracter => {
+          //"var = int + a;"
+          prueba5 = this.separarPorSimbolo(caracter, prueba5)
+          //["var","=","int", "+", "a"]
+        });
+        token = token.concat(prueba5);
+        
+      }    
     });
-
     //Elimino elementos vacios en el array
-    todo = todo.filter(x => x !== '' && x !== ' ');
+    token = token.filter(x => x !== '' && x !== ' ' && x !== '\n');
+
+    console.log(token);
+  
+
 
     //extraigo los numeros se parados por (espacios)
     
     var valoresAceptados =  /^[0-9]*(\.?)[0-9]+$/;
     // var valorString = "((?:[^\"\\]|\\.)*)";
     
-    console.log("todo el array de iteraciones",todo);    
+    // console.log("todo el array de iteraciones",todo);    
     
     
     todo.map(iteracion => {
-      console.log("iteracion",iteracion);
+      // console.log("iteracion",iteracion);
       
 
       //comprobacion de charConst ---> REVISAR
@@ -135,16 +151,18 @@ export class AppComponent {
 
   separarPorSimbolo(caracter:string, texto:string[]): string[]{
     let arreglo=[];
-    texto.map(palabra=>{
-      if(palabra[0] != "\""){        
+    var valoresAceptados =  /^[0-9]*(\.?)[0-9]+$/;
+    texto.map(palabra=>{      
+      if(!palabra.match(valoresAceptados)){
         let iguales = palabra.split(caracter);
         for(let i = 0; i < iguales.length; i++){
           arreglo.push(iguales[i]);
           arreglo.push(caracter);        
         }
-        arreglo.pop();
+        arreglo.pop();      
+      }else{
+        arreglo.push(palabra);
       }
-
     })      
     return arreglo;
   }
