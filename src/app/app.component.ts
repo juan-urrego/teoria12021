@@ -11,7 +11,7 @@ export class AppComponent {
 
   keywords: string[] = ['var', 'function', 'while', 'if', 'let', 'const'];  // KEYWORDS  -->automata
   operators: string[] = ['=', '+', '-', '*', '/', '%', '==', '!', '<', '>', '&&', '||'];  // OPERATOR
-  separators: string[] = ['(', ')', '{', '}', ',', ';', '[', ']', '\n', '.'];  // SEPARATOR
+  separators: string[] = ['(', ')', '{', '}', ',', ';', '[', ']', '.'];  // SEPARATOR
   regNumb = /^[0-9]*(\.?)[0-9]+$/; // regExp to identify numbers
   regString = /(["'])(.*?)\1/g; //'((?:[^"\\]|\\.)*)'; // regExp to identify strings
   regBadIdentify = /[^\"?]+/g;
@@ -27,7 +27,11 @@ export class AppComponent {
     let tokens: string[] = [];
     let tokenProcessed = [];
     let type: string;
-    const todo = this.divideByCharConstant(this.input);
+    let todo = [];
+    this.input.split('\n').map(line => {
+      todo=todo.concat(this.divideByCharConstant(line))
+    })
+
     todo.map(text => {
       if (text[0] === '"') {
         tokens.push(text);
@@ -47,6 +51,7 @@ export class AppComponent {
       else if (this.operators.indexOf(token) !== -1) type = 'Operator';
       else if (this.separators.indexOf(token) !== -1) type = 'Separator'
       else if (token.indexOf("\"") === -1 && (token.indexOf("?")) == -1) type = 'Identify'
+
       else type = 'Error'
       tokenProcessed.push({Token: token, Type: type});
     });
@@ -59,7 +64,6 @@ export class AppComponent {
     let stringAux2 = '';
     const splitText = [];
     for (let i = 0; i < text.length; ++i) {
-
       if (String(text[i]) === '"') {
         if (stringAux2.length !== 0) {
           splitText.push(stringAux2);
