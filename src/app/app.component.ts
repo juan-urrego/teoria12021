@@ -1,5 +1,5 @@
-import {Token} from './token';
-import {Component} from '@angular/core';
+import { Token } from './token';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +15,7 @@ export class AppComponent {
   regNumb = /^[0-9]*(.|e)?[0-9]+$/;// regExp to identify numbers
   regString = /(["'])(.*?)\1/g; //'((?:[^"\\]|\\.)*)'; // regExp to identify strings
   regBadIdentify = /[^\"?]+/g;
+  regInitialString = /[a-zA-Z]/
   specialChars: string[] = [' '].concat(this.operators).concat(this.separators); // Array with all chars;
 
   input: string;
@@ -50,10 +51,10 @@ export class AppComponent {
       else if (this.regNumb.test(token)) type = 'Number constant';
       else if (this.operators.indexOf(token) !== -1) type = 'Operator';
       else if (this.separators.indexOf(token) !== -1) type = 'Separator';
-      else if (token.indexOf("\"") === -1 && (token.indexOf("?")) == -1 && (token.indexOf("\\")) == -1) type = 'Identify';
+      else if (token.indexOf("\"") === -1 && (token.indexOf("?")) == -1 && (token.indexOf("\\")) == -1 && (token[0].match(this.regInitialString))) type = 'Identify';
 
       else type = 'Error'
-      tokenProcessed.push({Token: token, Type: type});
+      tokenProcessed.push({ Token: token, Type: type });
     });
     this.output = tokenProcessed;
   }
